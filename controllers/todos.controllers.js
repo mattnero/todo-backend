@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
 
 const getTodos = async (ctx) => {
     const todos = await prisma.todo.findMany()
@@ -7,7 +8,8 @@ const getTodos = async (ctx) => {
 };
 
 const addTodo = async (ctx) => {
-    const todo = await prisma.todo.create({
+    console.log(ctx.request.body)
+    const todoNew = await prisma.todo.create({
         data: {
             id: ctx.request.body.id,
             title: ctx.request.body.title,
@@ -16,12 +18,43 @@ const addTodo = async (ctx) => {
       })
     ctx.body = {
         message: 'Todo created',
-        data: todo,
+        data: todoNew,
     }
     ctx.status = 201;
 };
 
+const toggleTodo = async (ctx) => {
+    console.log(ctx.request.body)
+    const id = ctx.request.body.id
+    const todoNew = await prisma.todo.update({
+        where: { id },
+        data: {
+            complete: ctx.request.body.complete,
+        },
+      })
+    ctx.body = {
+        message: 'Todo updated',
+        data: todoNew,
+    }
+    ctx.status = 201;
+};
+
+const deleteAll = async (ctx) => {
+    console.log(ctx.request.body)
+    const todoNew = await prisma.todo.deleteMany({
+        
+      })
+    ctx.body = {
+        message: 'Todos deleted',
+        data: todoNew,
+    }
+    ctx.status = 201;
+};
+
+
 module.exports = {
     getTodos,
-    addTodo
+    addTodo,
+    toggleTodo,
+    deleteAll
 };
